@@ -10,6 +10,7 @@ use App\Destination;
 use App\Mark;
 use App\Mark_Translation;
 use App\Media;
+use App\Most_User;
 use App\Offer;
 use App\Offer_Collection;
 use App\Offer_Destination;
@@ -18,6 +19,8 @@ use App\Offer_Mark;
 use App\offer_media;
 use App\Offer_Translation;
 use App\OldOffer;
+use App\User;
+use App\user_to_app_to_role;
 use DateTime;
 use ErrorException;
 use Illuminate\Console\Command;
@@ -90,9 +93,10 @@ class ImportData extends Command
             $bar->advance();
         }
 
-        $this->setDestinationAddresses();
-
         $bar->finish();
+
+        $this->setDestinationAddresses();
+        $this->parseUserTable();
 
     }
 
@@ -284,10 +288,10 @@ class ImportData extends Command
         $model->content = html_entity_decode($oldOffer->terms);
         $model->location_notes = $oldOffer->null;
         $model->lang = 'en';
-        $model->name = $oldOffer->coupon_title;
+        $model->name = html_entity_decode($oldOffer->coupon_title);
         $model->slug = $oldOffer->coupon_slug;
-        $model->brief = $oldOffer->offer_highlight;
-        $model->summary = $oldOffer->coupon_offer;
+        $model->brief = html_entity_decode($oldOffer->offer_highlight);
+        $model->summary = html_entity_decode($oldOffer->coupon_offer);
         $this->info($oldOffer->id);
         $model->offer_id = $oldOffer->coupon_id;
 
@@ -307,7 +311,12 @@ class ImportData extends Command
         $model->updated_at = $oldOffer->post_modified;
         $model->merchant_name = $oldOffer->company_name;
         $model->merchant_email = $oldOffer->company_email;
-        $model->merchant_phone_number = $oldOffer->company_phone_number;
+        if ($oldOffer->merchant_phone_prefix != '' && $oldOffer->merchant_phone_prefix != null) {
+            $model->merchant_phone_prefix = $oldOffer->merchant_phone_prefix;
+        }
+        if ($oldOffer->merchant_phone_number != '' && $oldOffer->merchant_phone_number != null) {
+            $model->merchant_phone_number = $oldOffer->merchant_phone_number;
+        }
         $model->merchant_website = $oldOffer->company_website;
 
         // Get the merchant logo from old offer and convert it to id from new media table
@@ -333,7 +342,6 @@ class ImportData extends Command
         } else {
             $model->start_date = $oldOffer->valid_start;
         }
-
         if ($oldOffer->valid_end == '') {
             $model->end_date = null;
         } else {
@@ -378,6 +386,11 @@ class ImportData extends Command
         $model->category_id = $this->parseOfferCategoryTable($oldOffer);
 
         $model->status = 'publish';
+
+        $model->created_at = $oldOffer->new_offer_created_at;
+        $model->published_at = $oldOffer->new_offer_published_at;
+        $model->created_by = $oldOffer->new_offer_created_by;
+        $model->updated_by = $oldOffer->new_offer_updated_by;
 
         // Parse the featured image and coupon images fields into the media table
         $this->parseOfferMediaTable($oldOffer);
@@ -428,6 +441,11 @@ class ImportData extends Command
             foreach ($marks as $mark) {
                 try {
                     $testModel = Mark::where('id', $mark->id)->firstOrFail();
+
+                    $offer_mark_entry = new Offer_Mark();
+                    $offer_mark_entry->offer_id = $oldOffer->coupon_id;
+                    $offer_mark_entry->mark_id = $testModel->id;
+                    $offer_mark_entry->save();
                 } catch (ModelNotFoundException $e) {
                     $mark_entry = new Mark();
                     $mark_translation_entry = new Mark_Translation();
@@ -461,6 +479,48 @@ class ImportData extends Command
                 }
             }
         }
+    }
+
+    public function parseUserTable() {
+        $today = new DateTime('NOW');
+        $today = $today->format('Y-m-d H:i:s');
+
+        $mostUsers = Most_User::all();
+
+        $bar = $this->output->createProgressBar(count($mostUsers));
+        foreach($mostUsers as $mostUser) {
+            $modelUser = new User();
+            $modelUser->name = $mostUser->user_login;
+            $modelUser->username = $mostUser->user_login;
+            $modelUser->first_name = $mostUser->user_login;
+            $modelUser->last_name = '';
+            $modelUser->last_login_date = null;
+            $modelUser->email = $mostUser->user_email;
+            $modelUser->password = null;
+            $modelUser->is_sys_admin = false;
+            $modelUser->is_active = true;
+            $modelUser->phone = '';
+            $modelUser->security_question = '';
+            $modelUser->security_answer = '';
+            $modelUser->confirm_code = 'y';
+            $modelUser->default_app_id = null;
+            $modelUser->oauth_provider = null;
+            $modelUser->created_date = $mostUser->user_registered;
+            $modelUser->last_modified_date = $today;
+            $modelUser->created_by_id = 0;
+            $modelUser->last_modified_by_id = 0;
+            $modelUser->save();
+
+            $userToRole = new user_to_app_to_role();
+            $userToRole->user_id = $modelUser->id;
+            $userToRole->app_id = 6;
+            $userToRole->role_id = 7;
+            $userToRole->save();
+
+
+            $bar->advance();
+        }
+        $bar->finish();
     }
 
     public function parseManualEntries() {
@@ -501,8 +561,14 @@ class ImportData extends Command
         $model->terms = $oldOffer->offer_settings->terms;
         $model->locations = json_encode($oldOffer->offer_settings->locations);
         $model->company_email = $oldOffer->offer_settings->company_email;
-        $model->company_phone_number = $oldOffer->offer_settings->company_phone_number;
-        $model->company_website = $oldOffer->offer_settings->company_website;
+        try {
+            $model->merchant_phone_prefix = $oldOffer->offer_settings->merchant_phone_prefix;
+        } catch (ErrorException $e) {}
+        try {
+            $model->merchant_phone_number = $oldOffer->offer_settings->merchant_phone_number;
+        } catch (ErrorException $e) {
+            $model->merchant_phone_number = $oldOffer->offer_settings->company_phone_number;
+        }
         if (is_array($oldOffer->geo_location) || is_object($oldOffer->geo_location)) {
             $model->address = $oldOffer->geo_location->address;
             $model->lat = $oldOffer->geo_location->lat;
@@ -538,6 +604,10 @@ class ImportData extends Command
             $this->error('no mark');
         }
 
+        $model->new_offer_created_at = $oldOffer->new_offer_created_at;
+        $model->new_offer_published_at = $oldOffer->new_offer_published_at;
+        $model->new_offer_created_by = $oldOffer->new_offer_created_by;
+        $model->new_offer_updated_by = $oldOffer->new_offer_updated_by;
 
         $this->parseOldOffer($model);
 

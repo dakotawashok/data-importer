@@ -37,7 +37,8 @@ class CreateOldOffersTable extends Migration
             $table->text('terms')->nullable();
             $table->text('locations')->nullable();
             $table->string('company_email')->nullable();
-            $table->string('company_phone_number')->nullable();
+            $table->string('merchant_phone_prefix')->nullable();
+            $table->string('merchant_phone_number')->nullable();
             $table->string('company_website')->nullable();
             $table->text('offer_destination')->nullable();
             $table->text('offer_tags')->nullable();
@@ -52,6 +53,11 @@ class CreateOldOffersTable extends Migration
             $table->string('price_range')->nullable();
             $table->string('small_business')->nullable();
             $table->string('cuisine_type')->nullable();
+
+            $table->dateTime('new_offer_created_at')->nullable();
+            $table->dateTime('new_offer_published_at')->nullable();
+            $table->string('new_offer_created_by')->nullable();
+            $table->string('new_offer_updated_by')->nullable();
         });
     }
 
