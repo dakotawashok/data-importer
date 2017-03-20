@@ -309,7 +309,9 @@ class ImportData extends Command
         // Parse the id, dates, and merchant info from old offer
         $model->id = $oldOffer->coupon_id;
         $model->updated_at = $oldOffer->post_modified;
-        $model->merchant_name = $oldOffer->company_name;
+        $this->info($oldOffer->company_name);
+        $this->info(html_entity_decode($oldOffer->company_name, ENT_QUOTES | ENT_XML1, 'UTF-8'));
+        $model->merchant_name = html_entity_decode($oldOffer->company_name, ENT_QUOTES | ENT_XML1, 'UTF-8');
         $model->merchant_email = $oldOffer->company_email;
         if ($oldOffer->merchant_phone_prefix != '' && $oldOffer->merchant_phone_prefix != null) {
             $model->merchant_phone_prefix = $oldOffer->merchant_phone_prefix;
