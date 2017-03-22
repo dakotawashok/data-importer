@@ -106,6 +106,10 @@ class ImportData extends Command
      * @return mixed
      */
     public function parseImageMedia($objects) {
+//        if (preg_match('/^.*-[[:digit:]]{2,4}x[[:digit:]]{2,4}.(jpg|jpeg|png)?[^.]*$/', $name) != 1) {
+//            array_push($masterFiles, $name);
+//        }
+
         foreach ($objects as $name => $object) {
             if (filetype($name) != 'dir') {
                 $pieces = explode('app/Console/Commands/', $name);
@@ -341,6 +345,7 @@ class ImportData extends Command
                 $model->merchant_logo = $testModel->id;
             } catch (ModelNotFoundException $e) {
                 $this->error('company logo not found in media table...');
+                $this->error('path: ' . $companyLogoPath);
                 $model->merchant_logo = null;
             }
         } else {
@@ -442,6 +447,7 @@ class ImportData extends Command
                     $offerMediaModel->save();
                 } catch (ModelNotFoundException $e) {
                     $this->error('no coupon image I guess');
+                    $this->error('path: ' . $imageUrl);
                 }
             }
 
@@ -476,6 +482,7 @@ class ImportData extends Command
                             $mark_entry->media_id = $testModel->id;
                         } catch (ModelNotFoundException $e) {
                             $this->error('no mark image I guess');
+                            $this->error('path: ' . $imageUrl);
                         }
                     }
                     $mark_entry->save();
