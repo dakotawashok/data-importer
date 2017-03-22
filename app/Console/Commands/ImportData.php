@@ -106,12 +106,10 @@ class ImportData extends Command
      * @return mixed
      */
     public function parseImageMedia($objects) {
-//        if (preg_match('/^.*-[[:digit:]]{2,4}x[[:digit:]]{2,4}.(jpg|jpeg|png)?[^.]*$/', $name) != 1) {
-//            array_push($masterFiles, $name);
-//        }
+        $masterFiles = [];
 
         foreach ($objects as $name => $object) {
-            if (filetype($name) != 'dir') {
+            if (filetype($name) != 'dir' && basename($name) != '.DS_Store') {
                 $pieces = explode('app/Console/Commands/', $name);
 
                 $now = new DateTime('NOW');
@@ -128,8 +126,22 @@ class ImportData extends Command
                 $model->content_length = filesize($name);
                 $model->created_at = $now->format('Y-m-d H:i:s');
                 $model->save();
+
+                if (preg_match('/^.*(-|_)[[:digit:]]{2,4}x[[:digit:]]{2,4}.(jpg|jpeg|png)?[^.]*$/', $name) != 1) {
+                    array_push($masterFiles, $name);
+                }
             }
         }
+
+        $this->info('Copying master images...');
+        $bar = $this->output->createProgressBar(count($masterFiles));
+        foreach($masterFiles as $name) {
+            if (!copy($name, '/' . resource_path() . '/' . basename($name)) ) {
+                $this->error('Error copying ' . basename($name));
+            }
+            $bar->advance();
+        }
+        $bar->finish();
     }
 
     /**
@@ -216,7 +228,6 @@ class ImportData extends Command
                     $destination->address = $destination->name . ", " . $tempParentModel->name;
                     $destination->save();
                 } catch (ModelNotFoundException $e) {
-                    $this->error('wtf');
                 }
             }
         }
@@ -344,12 +355,8 @@ class ImportData extends Command
                 $testModel = Media::where('file_path', $companyLogoPath)->firstOrFail();
                 $model->merchant_logo = $testModel->id;
             } catch (ModelNotFoundException $e) {
-                $this->error('company logo not found in media table...');
-                $this->error('path: ' . $companyLogoPath);
                 $model->merchant_logo = null;
             }
-        } else {
-            $this->error("wtf happened? $oldOffer->company_logo");
         }
 
 
@@ -429,7 +436,6 @@ class ImportData extends Command
                 $offerMediaModel->media_id = $testModel->id;
                 $offerMediaModel->save();
             } catch (ModelNotFoundException $e) {
-                $this->error('no featured Image I guess');
             }
         }
 
@@ -446,8 +452,6 @@ class ImportData extends Command
                     $offerMediaModel->media_id = $testModel->id;
                     $offerMediaModel->save();
                 } catch (ModelNotFoundException $e) {
-                    $this->error('no coupon image I guess');
-                    $this->error('path: ' . $imageUrl);
                 }
             }
 
@@ -481,8 +485,6 @@ class ImportData extends Command
                             $testModel = Media::where('file_path', $imageUrl)->firstOrFail();
                             $mark_entry->media_id = $testModel->id;
                         } catch (ModelNotFoundException $e) {
-                            $this->error('no mark image I guess');
-                            $this->error('path: ' . $imageUrl);
                         }
                     }
                     $mark_entry->save();
@@ -626,7 +628,6 @@ class ImportData extends Command
         try {
             $model->marks = json_encode($oldOffer->offer_settings->marks);
         } catch (ErrorException $e) {
-            $this->error('no mark');
         }
 
         $model->new_offer_created_at = $oldOffer->new_offer_created_at;
