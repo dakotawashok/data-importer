@@ -292,8 +292,21 @@ class ImportData extends Command
         $model->slug = $oldOffer->coupon_slug;
         $model->brief = html_entity_decode($oldOffer->offer_highlight);
         $model->summary = html_entity_decode($oldOffer->coupon_offer);
-        $this->info($oldOffer->id);
         $model->offer_id = $oldOffer->coupon_id;
+
+
+//        $notes = substr($oldOffer->locations, 1, -1);
+//        $notes = htmlspecialchars_decode($notes);
+//        $this->info('location: ' . $notes);
+//        $notes = strip_tags($notes);
+//        $this->info('location: ' . $notes);
+//        $notes = str_replace('\\n', ' ', $notes);
+//        $notes = str_replace('&nbsp;', ' ', $notes);
+//        $this->info('location: ' . $notes);
+//        $notes = html_entity_decode($notes ,ENT_COMPAT,"iso-8859-1");
+//        $notes = utf8_decode($notes);
+//        $this->info('location: ' . $notes);
+//        $model->location_notes = $notes;
 
         $model->save();
     }
@@ -309,8 +322,6 @@ class ImportData extends Command
         // Parse the id, dates, and merchant info from old offer
         $model->id = $oldOffer->coupon_id;
         $model->updated_at = $oldOffer->post_modified;
-        $this->info($oldOffer->company_name);
-        $this->info(html_entity_decode($oldOffer->company_name, ENT_QUOTES | ENT_XML1, 'UTF-8'));
         $model->merchant_name = html_entity_decode($oldOffer->company_name, ENT_QUOTES | ENT_XML1, 'UTF-8');
         $model->merchant_email = $oldOffer->company_email;
         if ($oldOffer->merchant_phone_prefix != '' && $oldOffer->merchant_phone_prefix != null) {
@@ -595,6 +606,11 @@ class ImportData extends Command
             $model->cuisine_type = $oldOffer->cuisine_type;
         } catch (\ErrorException $e) {
             $model->cuisine_type = null;
+        }
+        try {
+            $model->company_website = $oldOffer->offer_settings->company_website;
+        } catch (\ErrorException $e) {
+
         }
         $model->offer_tags = json_encode($oldOffer->offer_tags);
         $model->offer_destination = json_encode($oldOffer->offer_destination);
