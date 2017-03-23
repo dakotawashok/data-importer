@@ -26,6 +26,7 @@ class CreateMediaTable extends Migration
             $table->integer('height')->nullable();
             $table->integer('width')->nullable();
             $table->datetime('created_at')->nullable();
+            $table->boolean('master_image')->nullable();
         });
     }
 

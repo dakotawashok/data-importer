@@ -107,6 +107,7 @@ class ImportData extends Command
      */
     public function parseImageMedia($objects) {
         $masterFiles = [];
+        $thumbnails = [];
 
         foreach ($objects as $name => $object) {
             if (filetype($name) != 'dir' && basename($name) != '.DS_Store') {
@@ -125,18 +126,33 @@ class ImportData extends Command
                 $model->height = getimagesize($name)[1];
                 $model->content_length = filesize($name);
                 $model->created_at = $now->format('Y-m-d H:i:s');
-                $model->save();
 
                 if (preg_match('/^.*(-|_)[[:digit:]]{2,4}x[[:digit:]]{2,4}.(jpg|jpeg|png)?[^.]*$/', $name) != 1) {
                     array_push($masterFiles, $name);
+                    $model->master_image = true;
+                } else {
+                    array_push($thumbnails, $name);
+                    $model->master_image = false;
                 }
+
+                $model->save();
             }
         }
 
         $this->info('Copying master images...');
         $bar = $this->output->createProgressBar(count($masterFiles));
         foreach($masterFiles as $name) {
-            if (!copy($name, '/' . resource_path() . '/' . basename($name)) ) {
+            if (!copy($name, '/' . resource_path() . '/master images/' . basename($name)) ) {
+                $this->error('Error copying ' . basename($name));
+            }
+            $bar->advance();
+        }
+        $bar->finish();
+
+        $this->info('Copying thumbnail images...');
+        $bar = $this->output->createProgressBar(count($thumbnails));
+        foreach($thumbnails as $name) {
+            if (!copy($name, '/' . resource_path() . '/thumbnails/' . basename($name)) ) {
                 $this->error('Error copying ' . basename($name));
             }
             $bar->advance();
