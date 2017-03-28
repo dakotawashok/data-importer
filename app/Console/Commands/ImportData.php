@@ -308,13 +308,8 @@ class ImportData extends Command
         // Get the merchant logo from old offer and convert it to id from new media table
         if ($oldOffer->company_logo != '' && $oldOffer->company_logo != null) {
             $companyLogoPath = explode('http://most.dev/wp-content/', $oldOffer->company_logo);
-            $companyLogoPath = $companyLogoPath[1];
-            try {
-                $testModel = Media::where('file_path', $companyLogoPath)->firstOrFail();
-                $model->merchant_logo = $testModel->id;
-            } catch (ModelNotFoundException $e) {
-                $model->merchant_logo = null;
-            }
+            $companyLogoPath = 'http://dinersclubofferstool.com/wp-content/' . $companyLogoPath[1];
+            $model->merchant_logo = $companyLogoPath;
         }
 
 
