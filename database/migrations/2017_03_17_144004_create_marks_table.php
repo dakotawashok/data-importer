@@ -16,7 +16,7 @@ class CreateMarksTable extends Migration
         Schema::create('mark', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->nullable();
-            $table->integer('media_id')->nullable();
+            $table->string('image' , 2000)->nullable();
             $table->boolean('active')->nullable();
         });
     }

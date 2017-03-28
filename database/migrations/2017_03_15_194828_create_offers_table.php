@@ -27,12 +27,12 @@ class CreateOffersTable extends Migration
             $table->string('cuisine_type')->nullable();
             $table->string('acceptance_level')->nullable();
             $table->string('status')->nullable();
-            $table->string('barcode')->nullable();
+            $table->string('barcode' , 2000)->nullable();
             $table->string('category_id')->nullable();
-            $table->string('merchant_logo')->nullable();
+            $table->string('merchant_logo' , 2000)->nullable();
             $table->string('partner_id')->nullable();
             $table->string('sma_id')->nullable();
-            $table->string('qrcode')->nullable();
+            $table->string('qrcode' , 2000)->nullable();
             $table->integer('price_range')->nullable();
             $table->dateTime('created_at')->nullable();
             $table->dateTime('updated_at')->nullable();
@@ -42,6 +42,7 @@ class CreateOffersTable extends Migration
             $table->boolean('terms_accepted')->nullable();
             $table->boolean('small_business')->nullable();
             $table->boolean('active')->nullable();
+            $table->string('primary_image' , 2000)->nullable();
         });
     }
 

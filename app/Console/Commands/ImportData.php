@@ -51,6 +51,7 @@ class ImportData extends Command
 
     // Variables
     protected $offers;
+    protected $multiples = 0;
 
 
     public function __construct()
@@ -72,9 +73,9 @@ class ImportData extends Command
         $mediaUrl = 'app/Console/Commands/uploads';
         $mediaNames = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($mediaUrl), \RecursiveIteratorIterator::SELF_FIRST);
 
-        $this->info('Importing Media files...this may take a while...');
-        $this->parseImageMedia($mediaNames);
-        $this->info('Done Importing Media Files!');
+//        $this->info('Importing Media files...this may take a while...');
+//        $this->parseImageMedia($mediaNames);
+//        $this->info('Done Importing Media Files!');
 
         $bar = $this->output->createProgressBar(count($fileNames));
 
@@ -96,68 +97,9 @@ class ImportData extends Command
         $bar->finish();
 
         $this->setDestinationAddresses();
-        $this->parseUserTable();
+//        $this->parseUserTable();
+        $this->info('Multiples: ' . $this->multiples);
 
-    }
-
-    /**
-     * Take all the file urls and get the information to put them in the media database
-     *
-     * @return mixed
-     */
-    public function parseImageMedia($objects) {
-        $masterFiles = [];
-        $thumbnails = [];
-
-        foreach ($objects as $name => $object) {
-            if (filetype($name) != 'dir' && basename($name) != '.DS_Store') {
-                $pieces = explode('app/Console/Commands/', $name);
-
-                $now = new DateTime('NOW');
-
-                $model = new Media();
-                $model->name = basename($name);
-                $model->tags = basename('');
-                $model->file_name = basename($name);
-                $model->file_source = basename($name);
-                $model->file_path = $pieces[1];
-                $model->content_type = getimagesize($name)['mime'];
-                $model->width = getimagesize($name)[0];
-                $model->height = getimagesize($name)[1];
-                $model->content_length = filesize($name);
-                $model->created_at = $now->format('Y-m-d H:i:s');
-
-                if (preg_match('/^.*(-|_)[[:digit:]]{2,4}x[[:digit:]]{2,4}.(jpg|jpeg|png)?[^.]*$/', $name) != 1) {
-                    array_push($masterFiles, $name);
-                    $model->master_image = true;
-                } else {
-                    array_push($thumbnails, $name);
-                    $model->master_image = false;
-                }
-
-                $model->save();
-            }
-        }
-
-        $this->info('Copying master images...');
-        $bar = $this->output->createProgressBar(count($masterFiles));
-        foreach($masterFiles as $name) {
-            if (!copy($name, '/' . resource_path() . '/master images/' . basename($name)) ) {
-                $this->error('Error copying ' . basename($name));
-            }
-            $bar->advance();
-        }
-        $bar->finish();
-
-        $this->info('Copying thumbnail images...');
-        $bar = $this->output->createProgressBar(count($thumbnails));
-        foreach($thumbnails as $name) {
-            if (!copy($name, '/' . resource_path() . '/thumbnails/' . basename($name)) ) {
-                $this->error('Error copying ' . basename($name));
-            }
-            $bar->advance();
-        }
-        $bar->finish();
     }
 
     /**
@@ -434,44 +376,25 @@ class ImportData extends Command
         $model->updated_by = $oldOffer->new_offer_updated_by;
 
         // Parse the featured image and coupon images fields into the media table
-        $this->parseOfferMediaTable($oldOffer);
-
-        $model->save();
-    }
-
-    public function parseOfferMediaTable($oldOffer) {
-        // get the featured image url and connect that to the media table and off_media table
-        if ($oldOffer->featured_image != '' && $oldOffer->featured_image != null) {
-            $featuredImageUrl = $oldOffer->featured_image;
-            $featuredImagePath = explode('http://most.dev/wp-content/', $featuredImageUrl);
-            $featuredImagePath = $featuredImagePath[1];
-            try {
-                $testModel = Media::where('file_path', $featuredImagePath)->firstOrFail();
-                $offerMediaModel = new Offer_Media();
-                $offerMediaModel->offer_id = $oldOffer->coupon_id;
-                $offerMediaModel->media_id = $testModel->id;
-                $offerMediaModel->save();
-            } catch (ModelNotFoundException $e) {
-            }
-        }
-
-        // get the coupon images and connect those to the media table and offer_media table
+        $images = 0;
         if ($oldOffer->coupon_images != '' && $oldOffer->coupon_images != null) {
+            $biggestImage = '';
             $coupon_images = json_decode($oldOffer->coupon_images);
             foreach($coupon_images as $imageUrl) {
+                $images++;
                 $imageUrl = explode('http://most.dev/wp-content/', $imageUrl);
-                $imageUrl = $imageUrl[1];
-                try {
-                    $testModel = Media::where('file_path', $imageUrl)->firstOrFail();
-                    $offerMediaModel = new Offer_Media();
-                    $offerMediaModel->offer_id = $oldOffer->coupon_id;
-                    $offerMediaModel->media_id = $testModel->id;
-                    $offerMediaModel->save();
-                } catch (ModelNotFoundException $e) {
+                $imageUrl = 'http://dinersclubofferstool.com/wp-content/' . $imageUrl[1];
+                if ($biggestImage == '') {
+                    $biggestImage = $imageUrl;
                 }
             }
-
+            $model->primary_image = $biggestImage;
         }
+        if ($images > 1) {
+            $this->multiples++;
+        }
+
+        $model->save();
     }
 
     public function parseOfferMarkTable($oldOffer) {
@@ -496,12 +419,7 @@ class ImportData extends Command
                     if ($mark->acceptance_mark_image != '' && $mark->acceptance_mark_image != null) {
                         $imageUrl = $mark->acceptance_mark_image;
                         $imageUrl = explode('http://most.dev/wp-content/', $imageUrl);
-                        $imageUrl = $imageUrl[1];
-                        try {
-                            $testModel = Media::where('file_path', $imageUrl)->firstOrFail();
-                            $mark_entry->media_id = $testModel->id;
-                        } catch (ModelNotFoundException $e) {
-                        }
+                        $mark_entry->image = 'http://dinersclubofferstool.com/wp-content/' . $imageUrl[1];
                     }
                     $mark_entry->save();
 
@@ -517,52 +435,6 @@ class ImportData extends Command
                 }
             }
         }
-    }
-
-    public function parseUserTable() {
-        $today = new DateTime('NOW');
-        $today = $today->format('Y-m-d H:i:s');
-
-        $mostUsers = Most_User::all();
-
-        $bar = $this->output->createProgressBar(count($mostUsers));
-        foreach($mostUsers as $mostUser) {
-            $modelUser = new User();
-            $modelUser->name = $mostUser->user_login;
-            $modelUser->username = $mostUser->user_login;
-            $modelUser->first_name = $mostUser->user_login;
-            $modelUser->last_name = '';
-            $modelUser->last_login_date = null;
-            $modelUser->email = $mostUser->user_email;
-            $modelUser->password = null;
-            $modelUser->is_sys_admin = false;
-            $modelUser->is_active = true;
-            $modelUser->phone = '';
-            $modelUser->security_question = '';
-            $modelUser->security_answer = '';
-            $modelUser->confirm_code = 'y';
-            $modelUser->default_app_id = null;
-            $modelUser->oauth_provider = null;
-            $modelUser->created_date = $mostUser->user_registered;
-            $modelUser->last_modified_date = $today;
-            $modelUser->created_by_id = 0;
-            $modelUser->last_modified_by_id = 0;
-            $modelUser->save();
-
-            $userToRole = new user_to_app_to_role();
-            $userToRole->user_id = $modelUser->id;
-            $userToRole->app_id = 6;
-            $userToRole->role_id = 7;
-            $userToRole->save();
-
-
-            $bar->advance();
-        }
-        $bar->finish();
-    }
-
-    public function parseManualEntries() {
-
     }
 
     /**
@@ -654,5 +526,157 @@ class ImportData extends Command
         $this->parseOldOffer($model);
 
         $model->save();
+    }
+
+
+
+
+    ///////////////////////////////////////////////////////
+    //
+    //
+    // UNUSED FUNCTIONS
+    //
+    //
+    ///////////////////////////////////////////////////////
+
+    /**
+     * Take all the file urls and get the information to put them in the media database
+     *
+     * @return mixed
+     */
+    public function parseImageMedia($objects) {
+        $masterFiles = [];
+        $thumbnails = [];
+
+        foreach ($objects as $name => $object) {
+            if (filetype($name) != 'dir' && basename($name) != '.DS_Store') {
+                $pieces = explode('app/Console/Commands/', $name);
+
+                $now = new DateTime('NOW');
+
+                $model = new Media();
+                $model->name = basename($name);
+                $model->tags = basename('');
+                $model->file_name = basename($name);
+                $model->file_source = basename($name);
+                $model->file_path = $pieces[1];
+                $model->content_type = getimagesize($name)['mime'];
+                $model->width = getimagesize($name)[0];
+                $model->height = getimagesize($name)[1];
+                $model->content_length = filesize($name);
+                $model->created_at = $now->format('Y-m-d H:i:s');
+
+                if (preg_match('/^.*(-|_)[[:digit:]]{2,4}x[[:digit:]]{2,4}.(jpg|jpeg|png)?[^.]*$/', $name) != 1) {
+                    array_push($masterFiles, $name);
+                    $model->master_image = true;
+                } else {
+                    array_push($thumbnails, $name);
+                    $model->master_image = false;
+                }
+
+                $model->save();
+            }
+        }
+
+        $this->info('Copying master images...');
+        $bar = $this->output->createProgressBar(count($masterFiles));
+        foreach($masterFiles as $name) {
+            if (!copy($name, '/' . resource_path() . '/master images/' . basename($name)) ) {
+                $this->error('Error copying ' . basename($name));
+            }
+            $bar->advance();
+        }
+        $bar->finish();
+
+        $this->info('Copying thumbnail images...');
+        $bar = $this->output->createProgressBar(count($thumbnails));
+        foreach($thumbnails as $name) {
+            if (!copy($name, '/' . resource_path() . '/thumbnails/' . basename($name)) ) {
+                $this->error('Error copying ' . basename($name));
+            }
+            $bar->advance();
+        }
+        $bar->finish();
+    }
+
+    public function parseOfferMediaTable($oldOffer) {
+        // get the featured image url and connect that to the media table and off_media table
+        if ($oldOffer->featured_image != '' && $oldOffer->featured_image != null) {
+            $featuredImageUrl = $oldOffer->featured_image;
+            $featuredImagePath = explode('http://most.dev/wp-content/', $featuredImageUrl);
+            $featuredImagePath = $featuredImagePath[1];
+            try {
+                $testModel = Media::where('file_path', $featuredImagePath)->firstOrFail();
+                $offerMediaModel = new Offer_Media();
+                $offerMediaModel->offer_id = $oldOffer->coupon_id;
+                $offerMediaModel->media_id = $testModel->id;
+                $offerMediaModel->save();
+            } catch (ModelNotFoundException $e) {
+            }
+        }
+
+        // get the coupon images and connect those to the media table and offer_media table
+        if ($oldOffer->coupon_images != '' && $oldOffer->coupon_images != null) {
+            $coupon_images = json_decode($oldOffer->coupon_images);
+            foreach($coupon_images as $imageUrl) {
+                $imageUrl = explode('http://most.dev/wp-content/', $imageUrl);
+                $imageUrl = $imageUrl[1];
+                try {
+                    $testModel = Media::where('file_path', $imageUrl)->firstOrFail();
+                    $offerMediaModel = new Offer_Media();
+                    $offerMediaModel->offer_id = $oldOffer->coupon_id;
+                    $offerMediaModel->media_id = $testModel->id;
+                    $offerMediaModel->save();
+                } catch (ModelNotFoundException $e) {
+                }
+            }
+
+        }
+    }
+
+    public function parseUserTable() {
+        $today = new DateTime('NOW');
+        $today = $today->format('Y-m-d H:i:s');
+
+        $mostUsers = Most_User::all();
+
+        $bar = $this->output->createProgressBar(count($mostUsers));
+        foreach($mostUsers as $mostUser) {
+            $modelUser = new User();
+            $modelUser->name = $mostUser->user_login;
+            $modelUser->username = $mostUser->user_login;
+            $modelUser->first_name = $mostUser->user_login;
+            $modelUser->last_name = '';
+            $modelUser->last_login_date = null;
+            $modelUser->email = $mostUser->user_email;
+            $modelUser->password = null;
+            $modelUser->is_sys_admin = false;
+            $modelUser->is_active = true;
+            $modelUser->phone = '';
+            $modelUser->security_question = '';
+            $modelUser->security_answer = '';
+            $modelUser->confirm_code = 'y';
+            $modelUser->default_app_id = null;
+            $modelUser->oauth_provider = null;
+            $modelUser->created_date = $mostUser->user_registered;
+            $modelUser->last_modified_date = $today;
+            $modelUser->created_by_id = 0;
+            $modelUser->last_modified_by_id = 0;
+            $modelUser->save();
+
+            $userToRole = new user_to_app_to_role();
+            $userToRole->user_id = $modelUser->id;
+            $userToRole->app_id = 6;
+            $userToRole->role_id = 7;
+            $userToRole->save();
+
+
+            $bar->advance();
+        }
+        $bar->finish();
+    }
+
+    public function parseManualEntries() {
+
     }
 }
