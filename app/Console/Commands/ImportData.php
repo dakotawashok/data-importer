@@ -98,7 +98,7 @@ class ImportData extends Command
 
         $this->setDestinationAddresses();
 //        $this->parseUserTable();
-        $this->info('Multiples: ' . $this->multiples);
+//        $this->info('Multiples: ' . $this->multiples);
 
     }
 
@@ -128,6 +128,7 @@ class ImportData extends Command
                     $collection_translation_entry = new Collection_Translation();
 
                     $collection_entry->active = true;
+                    $collection_entry->id = $destination->term_id;
                     $collection_entry->save();
 
                     $collection_translation_entry->collection_id = $collection_entry->id;
@@ -233,6 +234,7 @@ class ImportData extends Command
                 $catTranslationModel = new Category_Translation();
 
                 $catModel->active = true;
+                $catModel->id = $tag->term_id;
                 $catModel->save();
 
                 $catTranslationModel->category_id = $catModel->id;
