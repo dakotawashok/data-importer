@@ -99,7 +99,7 @@ class ImportData extends Command
         $this->setDestinationAddresses();
 //        $this->parseUserTable();
 //        $this->info('Multiples: ' . $this->multiples);
-
+        $this->parseManualEntries();
     }
 
     /**
@@ -119,7 +119,7 @@ class ImportData extends Command
                     $testCollection = Collection_Translation::where('name', $destination->name)->where('slug', $destination->slug)->firstOrFail();
 
                     $offer_collection_entry = new Offer_Collection();
-                    $offer_collection_entry->collection_id = $testCollection->id;
+                    $offer_collection_entry->collection_id = $destination->term_id;
                     $offer_collection_entry->offer_id = $oldOffer->coupon_id;
                     $offer_collection_entry->save();
                 } catch (ModelNotFoundException $e) {
@@ -137,7 +137,7 @@ class ImportData extends Command
                     $collection_translation_entry->slug = $destination->slug;
                     $collection_translation_entry->save();
 
-                    $offer_collection_entry->collection_id = $collection_entry->id;
+                    $offer_collection_entry->collection_id = $destination->term_id;
                     $offer_collection_entry->offer_id = $oldOffer->coupon_id;
                     $offer_collection_entry->save();
                 }
@@ -673,7 +673,21 @@ class ImportData extends Command
         $bar->finish();
     }
 
-    public function parseManualEntries() {
+    ///////////////////////////////////////////////////////
+    //
+    //
+    // MANUAL ENTRIES
+    //
+    //
+    ///////////////////////////////////////////////////////
 
+    public function parseManualEntries() {
+        // Change the slugs of the mark translations
+        $tempMarkTranslation = Mark_Translation::where('mark_id', 6134)->firstOrFail();
+        $tempMarkTranslation->slug = "diners-club-acceptance-mark";
+        $tempMarkTranslation->save();
+        $tempMarkTranslation = Mark_Translation::where('mark_id', 6136)->firstOrFail();
+        $tempMarkTranslation->slug = "discover-acceptance-mark";
+        $tempMarkTranslation->save();
     }
 }
