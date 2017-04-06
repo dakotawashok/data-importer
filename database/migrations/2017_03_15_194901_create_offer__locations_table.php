@@ -19,8 +19,8 @@ class CreateOfferLocationsTable extends Migration
             $table->string('name')->nullable();
             $table->string('address')->nullable();
             $table->integer('offer_id');
-            $table->decimal('lat')->nullable();
-            $table->decimal('lng')->nullable();
+            $table->double('lat',11,8)->nullable();
+            $table->double('lng',11,8)->nullable();
             $table->string('type')->nullable();
             $table->boolean('countrywide')->nullable();
         });

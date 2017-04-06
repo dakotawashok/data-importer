@@ -207,6 +207,12 @@ class ImportData extends Command
             $model->name = $location->correctedAddress;
             $model->lat = $location->point->lat;
             $model->lng = $location->point->lng;
+            $this->info('lat: ' . $location->point->lat);
+            $this->info('lng: ' . $location->point->lng);
+
+            $this->info('lat: ' . $model->lat);
+            $this->info('lng: ' . $model->lng);
+
             $model->offer_id = $oldOffer->coupon_id;
             $model->countrywide = false;
             $model->save();
