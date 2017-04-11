@@ -20,6 +20,7 @@ use App\offer_media;
 use App\Offer_Translation;
 use App\OldOffer;
 use App\User;
+use App\user_custom;
 use App\user_to_app_to_role;
 use DateTime;
 use ErrorException;
@@ -77,29 +78,29 @@ class ImportData extends Command
 //        $this->parseImageMedia($mediaNames);
 //        $this->info('Done Importing Media Files!');
 
-        $bar = $this->output->createProgressBar(count($fileNames));
-
-        foreach ($fileNames as $item) {
-            if ($item != "." && $item != ".." && $item != '.DS_Store') {
-                $offerContents = file_get_contents($folderUrl . '/' . $item);
-                $offer = json_decode($offerContents);
-
-                if (is_array($offer) || is_object($offer)) {
-                    $this->storeOldOffer($offer);
-                } else {
-                    $this->error('Error!');
-                }
-                //print_r($offer);
-            }
-            $bar->advance();
-        }
-
-        $bar->finish();
-
-        $this->setDestinationAddresses();
-//        $this->parseUserTable();
+//        $bar = $this->output->createProgressBar(count($fileNames));
+//
+//        foreach ($fileNames as $item) {
+//            if ($item != "." && $item != ".." && $item != '.DS_Store') {
+//                $offerContents = file_get_contents($folderUrl . '/' . $item);
+//                $offer = json_decode($offerContents);
+//
+//                if (is_array($offer) || is_object($offer)) {
+//                    $this->storeOldOffer($offer);
+//                } else {
+//                    $this->error('Error!');
+//                }
+//                //print_r($offer);
+//            }
+//            $bar->advance();
+//        }
+//
+//        $bar->finish();
+//
+//        $this->setDestinationAddresses();
+        $this->parseUserTable();
 //        $this->info('Multiples: ' . $this->multiples);
-        $this->parseManualEntries();
+//        $this->parseManualEntries();
     }
 
     /**
@@ -648,8 +649,8 @@ class ImportData extends Command
             $modelUser = new User();
             $modelUser->name = $mostUser->user_login;
             $modelUser->username = $mostUser->user_login;
-            $modelUser->first_name = $mostUser->user_login;
-            $modelUser->last_name = '';
+            $modelUser->first_name = $mostUser->first_name;
+            $modelUser->last_name = $mostUser->last_name;
             $modelUser->last_login_date = null;
             $modelUser->email = $mostUser->user_email;
             $modelUser->password = null;
@@ -665,6 +666,7 @@ class ImportData extends Command
             $modelUser->last_modified_date = $today;
             $modelUser->created_by_id = 0;
             $modelUser->last_modified_by_id = 0;
+            $modelUser->id = $mostUser->id;
             $modelUser->save();
 
             $userToRole = new user_to_app_to_role();
@@ -673,10 +675,27 @@ class ImportData extends Command
             $userToRole->role_id = 7;
             $userToRole->save();
 
+            if ($mostUser->franchise != '' && !is_null($mostUser->franchise)) {
+                $this->parseFranchise($mostUser);
+            }
+
 
             $bar->advance();
         }
         $bar->finish();
+    }
+
+    public function parseFranchise($mostUser) {
+        $today = new DateTime('NOW');
+        $today = $today->format('Y-m-d H:i:s');
+
+        $franchise = new user_custom();
+        $franchise->user_id = $mostUser->id;
+        $franchise->name = 'franchise';
+        $franchise->value = $mostUser->franchise;
+        $franchise->created_date = $today;
+        $franchise->last_modified_date = $today;
+        $franchise->save();
     }
 
     ///////////////////////////////////////////////////////

@@ -24,6 +24,12 @@ class CreateMostUsersTable extends Migration
             $table->string('user_activation_key')->nullable();
             $table->boolean('user_status')->nullable();
             $table->string('display_name')->nullable();
+
+            $table->string('meta_value')->nullable();
+            $table->string('franchise')->nullable();
+            $table->string('nickname')->nullable();
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
         });
     }
 
