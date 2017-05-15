@@ -1,1 +1,119 @@
-{"coupon_id":1188,"new_offer_status":"publish","new_offer_created_at":"2013-12-30 21:17:06","new_offer_published_at":"2013-12-30 21:17:06","new_offer_created_by":"testninjas@gmail.com","new_offer_updated_at":"2015-10-26 13:21:35","new_offer_updated_by":"testninjas@gmail.com","coupon_title":"EuroAgentur Hotel Rokoko P-VC0003","coupon_slug":"euroagentur-hotel-rokoko","post_modified":"2015-10-26 13:21:35","offer_settings":{"offer_highlight":"10% off hotel stay","coupon_offer":"Receive a 10% discount off the best available rates.","company_name":"EuroAgentur Hotel Rokoko","dates":{"date_options":"Ongoing","valid_start":"","valid_end":""},"company_logo":"http:\/\/most.dev\/wp-content\/uploads\/2014\/01\/EuroAgentur-Hotel-Rokoko_r1.png","featured_image":"","coupon_images":["http:\/\/most.dev\/wp-content\/uploads\/2013\/12\/Euroagentur-hotel-rokoko-Offer-e1415308447264.jpg"],"marks":[{"terms":"Unless otherwise stated above, for this offer to be valid, the cardmember shall:\r\n(1) pay with a Diners Club or any card within the partner network which is mutually agreed upon, in writing by the parties;\r\n(2) show the offer in print or mobile phone; and\r\n(3) if explicitly required by the merchant, enter the promotional code if purchasing online.\r\nOnly one offer per cardmember can be used and cannot be combined with any other offer, unless otherwise stated. This offer is non-refundable, transferable and carries no monetary alternative.","acceptance_mark_image":"http:\/\/most.dev\/wp-content\/uploads\/2014\/11\/diners_acceptance.png","id":6134,"name":"Diners Club Acceptance Mark"}],"terms":"&lt;p&gt;The newly renovated four star Hotel Rococo, situated in the very center of Prague &amp;#8211; on Wenceslas Square &amp;#8211; offers its guests an unrivaled combination of an attractive location and luxury accommodation.&lt;\/p&gt;\n&lt;p&gt;This offer is applicable only for payments made with Diners Club card and cannot be combined with any other special offers.&lt;\/p&gt;\n","locations":"&lt;p&gt;&lt;strong&gt;EuroAgentur Hotel Rokoko ****&lt;\/strong&gt;&lt;br \/&gt;\nV&aacute;clavsk&eacute; n&aacute;m. 38\/794&lt;br \/&gt;\n110 00 Praha 1&lt;br \/&gt;\nCzech Republic&lt;br \/&gt;\n&lt;a href=&quot;tel:00420 224 403 333&quot;&gt;00420 224 403 333&lt;\/a&gt;&lt;br \/&gt;\n&lt;a href=&quot;mailto:reception@rokoko.euroagentur.cz&quot; target=&quot;_blank&quot;&gt;reception@rokoko.euroagentur.cz&lt;\/a&gt;&lt;br \/&gt;\n&lt;a href=&quot;http:\/\/www.hotelrokoko.cz\/en&quot; target=&quot;_blank&quot;&gt;Website&lt;\/a&gt;&lt;\/p&gt;\n&lt;p&gt;&amp;nbsp;&lt;\/p&gt;\n","company_email":"reception@rokoko.euroagentur.cz","company_phone_number":"00420 224 403 333","company_website":"http:\/\/www.hotelrokoko.cz\/en","merchant_phone_prefix":null,"merchant_phone_number":null},"offer_destination":[{"name":"Czech Republic","slug":"czech-republic","term_id":76,"term_taxonomy_id":76},{"name":"Prague","slug":"prague","term_id":95,"term_taxonomy_id":95,"parent":76}],"offer_tags":[{"name":"Hotels","slug":"stay","term_id":8,"term_taxonomy_id":8}],"slider_coupons":[{"name":"Carousel Coupon","slug":"carousel-coupon","term_id":11,"term_taxonomy_id":11}],"remote_sites":[{"name":"Diners Club Privileges","slug":"dinersclubprivileges","term_id":240,"term_taxonomy_id":240}],"featured":[],"offer_sticky_option":false,"geo_location":{"address":"V\u00e1clavsk\u00e9 n\u00e1m\u011bst\u00ed 794\/38, 110 00 Praha-Praha 1, Czech Republic","lat":50.0814493,"lng":14.4262648},"geolocation_v2":[{"address":"V\u00e1clavsk\u00e9 n\u00e1m\u011bst\u00ed 794\/38, 110 00 Praha-Praha 1, Czech Republic","body":"V\u00e1clavsk\u00e9 n\u00e1m. 38\/794, New Town, 110 00 Prague-Praha 1, Czech Republic","correctedAddress":"V\u00e1clavsk\u00e9 n\u00e1m\u011bst\u00ed 794\/38, 110 00 Praha-Praha 1, Czech Republic","iconid":null,"point":{"lat":50.0814493,"lng":14.4262648},"poly":null,"kml":null,"title":"","type":null,"viewport":{"sw":{"lat":50.080100319708,"lng":14.424915819709},"ne":{"lat":50.082798280291,"lng":14.427613780291}},"postid":null,"url":null}],"price_range":"","small_business":0,"cuisine_type":""}
+{
+  "coupon_id": 1188,
+  "new_offer_status": "publish",
+  "new_offer_created_at": "2013-12-30 21:17:06",
+  "new_offer_published_at": "2013-12-30 21:17:06",
+  "new_offer_created_by": "testninjas@gmail.com",
+  "new_offer_updated_at": "2015-10-26 13:21:35",
+  "new_offer_updated_by": "testninjas@gmail.com",
+  "coupon_title": "EuroAgentur Hotel Rokoko P-VC0003",
+  "coupon_slug": "euroagentur-hotel-rokoko",
+  "post_modified": "2015-10-26 13:21:35",
+  "offer_settings": {
+    "offer_highlight": "10% off hotel stay",
+    "coupon_offer": "Receive a 10% discount off the best available rates.",
+    "company_name": "EuroAgentur Hotel Rokoko",
+    "dates": {
+      "date_options": "Ongoing",
+      "valid_start": "",
+      "valid_end": ""
+    },
+    "company_logo": "https:\/\/dinersclubofferstool.com\/wp-content\/uploads\/2014\/01\/EuroAgentur-Hotel-Rokoko_r1.png",
+    "featured_image": "",
+    "coupon_images": [
+      "https:\/\/dinersclubofferstool.com\/wp-content\/uploads\/2013\/12\/Euroagentur-hotel-rokoko-Offer-e1415308447264.jpg"
+    ],
+    "marks": [
+      {
+        "terms": "Unless otherwise stated above, for this offer to be valid, the cardmember shall:\r\n(1) pay with a Diners Club or any card within the partner network which is mutually agreed upon, in writing by the parties;\r\n(2) show the offer in print or mobile phone; and\r\n(3) if explicitly required by the merchant, enter the promotional code if purchasing online.\r\nOnly one offer per cardmember can be used and cannot be combined with any other offer, unless otherwise stated. This offer is non-refundable, transferable and carries no monetary alternative.",
+        "acceptance_mark_image": "https:\/\/dinersclubofferstool.com\/wp-content\/uploads\/2014\/11\/diners_acceptance.png",
+        "id": 6134,
+        "name": "Diners Club Acceptance Mark"
+      }
+    ],
+    "terms": "&lt;p&gt;The newly renovated four star Hotel Rococo, situated in the very center of Prague &amp;#8211; on Wenceslas Square &amp;#8211; offers its guests an unrivaled combination of an attractive location and luxury accommodation.&lt;\/p&gt;\n&lt;p&gt;This offer is applicable only for payments made with Diners Club card and cannot be combined with any other special offers.&lt;\/p&gt;\n",
+    "locations": "&lt;p&gt;&lt;strong&gt;EuroAgentur Hotel Rokoko ****&lt;\/strong&gt;&lt;br \/&gt;\nV&aacute;clavsk&eacute; n&aacute;m. 38\/794&lt;br \/&gt;\n110 00 Praha 1&lt;br \/&gt;\nCzech Republic&lt;br \/&gt;\n&lt;a href=&quot;tel:00420 224 403 333&quot;&gt;00420 224 403 333&lt;\/a&gt;&lt;br \/&gt;\n&lt;a href=&quot;mailto:reception@rokoko.euroagentur.cz&quot; target=&quot;_blank&quot;&gt;reception@rokoko.euroagentur.cz&lt;\/a&gt;&lt;br \/&gt;\n&lt;a href=&quot;http:\/\/www.hotelrokoko.cz\/en&quot; target=&quot;_blank&quot;&gt;Website&lt;\/a&gt;&lt;\/p&gt;\n&lt;p&gt;&amp;nbsp;&lt;\/p&gt;\n",
+    "company_email": "reception@rokoko.euroagentur.cz",
+    "company_phone_number": "00420 224 403 333",
+    "company_website": "http:\/\/www.hotelrokoko.cz\/en",
+    "merchant_phone_prefix": null,
+    "merchant_phone_number": null
+  },
+  "offer_destination": [
+    {
+      "name": "Czech Republic",
+      "slug": "czech-republic",
+      "term_id": 76,
+      "term_taxonomy_id": 76
+    },
+    {
+      "name": "Prague",
+      "slug": "prague",
+      "term_id": 95,
+      "term_taxonomy_id": 95,
+      "parent": 76
+    }
+  ],
+  "offer_tags": [
+    {
+      "name": "Hotels",
+      "slug": "stay",
+      "term_id": 8,
+      "term_taxonomy_id": 8
+    }
+  ],
+  "slider_coupons": [
+    {
+      "name": "Carousel Coupon",
+      "slug": "carousel-coupon",
+      "term_id": 11,
+      "term_taxonomy_id": 11
+    }
+  ],
+  "remote_sites": [
+    {
+      "name": "Diners Club Privileges",
+      "slug": "dinersclubprivileges",
+      "term_id": 240,
+      "term_taxonomy_id": 240
+    }
+  ],
+  "featured": [],
+  "offer_sticky_option": false,
+  "geo_location": {
+    "address": "V\u00e1clavsk\u00e9 n\u00e1m\u011bst\u00ed 794\/38, 110 00 Praha-Praha 1, Czech Republic",
+    "lat": 50.0814493,
+    "lng": 14.4262648
+  },
+  "geolocation_v2": [
+    {
+      "address": "V\u00e1clavsk\u00e9 n\u00e1m\u011bst\u00ed 794\/38, 110 00 Praha-Praha 1, Czech Republic",
+      "body": "V\u00e1clavsk\u00e9 n\u00e1m. 38\/794, New Town, 110 00 Prague-Praha 1, Czech Republic",
+      "correctedAddress": "V\u00e1clavsk\u00e9 n\u00e1m\u011bst\u00ed 794\/38, 110 00 Praha-Praha 1, Czech Republic",
+      "iconid": null,
+      "point": {
+        "lat": 50.0814493,
+        "lng": 14.4262648
+      },
+      "poly": null,
+      "kml": null,
+      "title": "",
+      "type": null,
+      "viewport": {
+        "sw": {
+          "lat": 50.080100319708,
+          "lng": 14.424915819709
+        },
+        "ne": {
+          "lat": 50.082798280291,
+          "lng": 14.427613780291
+        }
+      },
+      "postid": null,
+      "url": null
+    }
+  ],
+  "price_range": "",
+  "small_business": 0,
+  "cuisine_type": ""
+}

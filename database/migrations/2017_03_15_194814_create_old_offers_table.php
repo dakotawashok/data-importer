@@ -58,6 +58,7 @@ class CreateOldOffersTable extends Migration
             $table->dateTime('new_offer_published_at')->nullable();
             $table->string('new_offer_created_by')->nullable();
             $table->string('new_offer_updated_by')->nullable();
+            $table->string('new_offer_status')->nullable();
         });
     }
 

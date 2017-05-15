@@ -7,6 +7,7 @@ use App\Category_Translation;
 use App\Collection;
 use App\Collection_Translation;
 use App\Destination;
+use App\DestinationWithCoords;
 use App\Mark;
 use App\Mark_Translation;
 use App\Media;
@@ -96,9 +97,10 @@ class ImportData extends Command
         $bar->finish();
 
         $this->setDestinationAddresses();
-//        $this->parseUserTable();
+        $this->parseUserTable();
 //        $this->info('Multiples: ' . $this->multiples);
         $this->parseManualEntries();
+//        $this->parseDestinations();
     }
 
     /**
@@ -306,11 +308,13 @@ class ImportData extends Command
         }
         $model->merchant_website = $oldOffer->company_website;
 
+
         // Get the merchant logo from old offer and convert it to id from new media table
         if ($oldOffer->company_logo != '' && $oldOffer->company_logo != null) {
-            $companyLogoPath = explode('http://most.dev/wp-content/', $oldOffer->company_logo);
-            $companyLogoPath = 'http://dinersclubofferstool.com/wp-content/' . $companyLogoPath[1];
-            $model->merchant_logo = $companyLogoPath;
+//            $companyLogoPath = explode('https://most.dev/wp-content/', $oldOffer->company_logo);
+//            $this->info(print_r($companyLogoPath));
+//            $companyLogoPath = 'https://dinersclubofferstool.com/wp-content/' . $companyLogoPath[1];
+            $model->merchant_logo = $oldOffer->company_logo;
         }
 
 
@@ -364,7 +368,7 @@ class ImportData extends Command
         // Parse and save the categories from the old offer into the new database and set the first category id to the offer category id
         $model->category_id = $this->parseOfferCategoryTable($oldOffer);
 
-        $model->status = 'publish';
+        $model->status = $oldOffer->new_offer_status;
 
         $model->created_at = $oldOffer->new_offer_created_at;
         $model->published_at = $oldOffer->new_offer_published_at;
@@ -378,8 +382,8 @@ class ImportData extends Command
             $coupon_images = json_decode($oldOffer->coupon_images);
             foreach($coupon_images as $imageUrl) {
                 $images++;
-                $imageUrl = explode('http://most.dev/wp-content/', $imageUrl);
-                $imageUrl = 'http://dinersclubofferstool.com/wp-content/' . $imageUrl[1];
+//                $imageUrl = explode('https://most.dev/wp-content/', $imageUrl);
+//                $imageUrl = 'https://dinersclubofferstool.com/wp-content/' . $imageUrl[1];
                 if ($biggestImage == '') {
                     $biggestImage = $imageUrl;
                 }
@@ -413,9 +417,10 @@ class ImportData extends Command
                     $mark_entry->name = $mark->name;
                     $mark_entry->active = true;
                     if ($mark->acceptance_mark_image != '' && $mark->acceptance_mark_image != null) {
-                        $imageUrl = $mark->acceptance_mark_image;
-                        $imageUrl = explode('http://most.dev/wp-content/', $imageUrl);
-                        $mark_entry->image = 'http://dinersclubofferstool.com/wp-content/' . $imageUrl[1];
+//                        $imageUrl = $mark->acceptance_mark_image;
+//                        $imageUrl = explode('https://most.dev/wp-content/', $imageUrl);
+//                        $mark_entry->image = 'https://dinersclubofferstool.com/wp-content/' . $imageUrl[1];
+                        $mark_entry->image = $mark->acceptance_mark_image;
                     }
                     $mark_entry->save();
 
@@ -467,6 +472,7 @@ class ImportData extends Command
         $model->terms = $oldOffer->offer_settings->terms;
         $model->locations = json_encode($oldOffer->offer_settings->locations);
         $model->company_email = $oldOffer->offer_settings->company_email;
+        $model->new_offer_status = $oldOffer->new_offer_status;
         try {
             $model->merchant_phone_prefix = $oldOffer->offer_settings->merchant_phone_prefix;
         } catch (ErrorException $e) {}
@@ -524,7 +530,23 @@ class ImportData extends Command
         $model->save();
     }
 
+    public function parseDestinations() {
+        $destinations = Destination::all();
+        $destinationsWithCoords = DestinationWithCoords::all();
 
+        $bar = $this->output->createProgressBar(count($destinationsWithCoords));
+        foreach($destinationsWithCoords as $destinationwithcoord) {
+            foreach($destinations as $destination) {
+                if ($destinationwithcoord->id == $destination->id) {
+                    $destination->lat = $destinationwithcoord->lat;
+                    $destination->lng = $destinationwithcoord->lng;
+                    $destination->save();
+                }
+            }
+
+        }
+        $bar->finish();
+    }
 
 
     ///////////////////////////////////////////////////////
@@ -599,7 +621,7 @@ class ImportData extends Command
         // get the featured image url and connect that to the media table and off_media table
         if ($oldOffer->featured_image != '' && $oldOffer->featured_image != null) {
             $featuredImageUrl = $oldOffer->featured_image;
-            $featuredImagePath = explode('http://most.dev/wp-content/', $featuredImageUrl);
+            $featuredImagePath = explode('https://most.dev/wp-content/', $featuredImageUrl);
             $featuredImagePath = $featuredImagePath[1];
             try {
                 $testModel = Media::where('file_path', $featuredImagePath)->firstOrFail();
@@ -615,7 +637,7 @@ class ImportData extends Command
         if ($oldOffer->coupon_images != '' && $oldOffer->coupon_images != null) {
             $coupon_images = json_decode($oldOffer->coupon_images);
             foreach($coupon_images as $imageUrl) {
-                $imageUrl = explode('http://most.dev/wp-content/', $imageUrl);
+                $imageUrl = explode('https://most.dev/wp-content/', $imageUrl);
                 $imageUrl = $imageUrl[1];
                 try {
                     $testModel = Media::where('file_path', $imageUrl)->firstOrFail();
