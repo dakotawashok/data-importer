@@ -32,6 +32,7 @@ class CreateOffersTable extends Migration
             $table->string('merchant_logo' , 2000)->nullable();
             $table->string('partner_id')->nullable();
             $table->boolean('sma')->nullable();
+            $table->boolean('privileges_only')->nullable()->default(1);
             $table->string('qrcode' , 2000)->nullable();
             $table->integer('price_range')->nullable();
             $table->dateTime('created_at')->nullable();
