@@ -74,9 +74,9 @@ class ImportData extends Command
         $mediaUrl = 'app/Console/Commands/uploads';
         $mediaNames = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($mediaUrl), \RecursiveIteratorIterator::SELF_FIRST);
 
-//        $this->info('Importing Media files...this may take a while...');
-//        $this->parseImageMedia($mediaNames);
-//        $this->info('Done Importing Media Files!');
+        $this->info('Importing Media files...this may take a while...');
+        $this->parseImageMedia($mediaNames);
+        $this->info('Done Importing Media Files!');
 
         $bar = $this->output->createProgressBar(count($fileNames));
 
@@ -98,9 +98,9 @@ class ImportData extends Command
 
         $this->setDestinationAddresses();
         $this->parseUserTable();
-//        $this->info('Multiples: ' . $this->multiples);
+        $this->info('Multiples: ' . $this->multiples);
         $this->parseManualEntries();
-//        $this->parseDestinations();
+        $this->parseDestinations();
     }
 
     /**
